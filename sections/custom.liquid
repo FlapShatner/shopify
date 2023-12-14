@@ -1,0 +1,43 @@
+{%- for block in section.blocks -%}
+  {%- case block.type -%}
+    {%- when '@app' -%}
+      {% render block %}
+  {% endcase %}
+{% endfor %}
+
+<script>
+let cartBtn = document.querySelector('.cart')
+cartBtn.addEventListener('click', function () {
+  let cartDrawer = document.querySelector('[data-cart-drawer]')
+  cartDrawer.classList.add('sd-sidebar--visible')
+  document.querySelector('body').classList.add('no-scroll')
+  let closeBtn = document.querySelector('.sd-sidebar-close')
+  closeBtn.addEventListener('click', function () {
+    cartDrawer.classList.remove('sd-sidebar--visible')
+    document.querySelector('body').classList.remove('no-scroll')
+  })
+})
+
+             
+            
+</script>
+
+
+{% schema %}
+{
+  "name": "Custom Decal",
+"tag": "section",
+"class": "section",
+  "blocks":[
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

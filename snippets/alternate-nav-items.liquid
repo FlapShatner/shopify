@@ -1,0 +1,247 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {   
+var parents = document.querySelectorAll(".drop-link")
+var childList = document.querySelector(".child-list")
+
+parents.forEach(element => {
+   element.addEventListener("mouseenter", (event) => {
+     var targetElem = event.target.children[1]
+     if(targetElem){       
+        targetElem.classList.add("visible")
+        var rect = targetElem.getBoundingClientRect()
+        var distFromTop = document.documentElement.clientHeight - rect.bottom
+        var distFromRight = document.documentElement.clientWidth - rect.right
+        if(distFromRight < 0){
+          targetElem.style.left = distFromRight + "px"
+        }
+       if(distFromTop < 0){
+         targetElem.style.bottom = distFromTop + "px"
+       }
+     }
+  })
+  })  
+}) 
+
+document.addEventListener('DOMContentLoaded', function () {   
+var parents = document.querySelectorAll(".header__menus-item")
+var childList = document.querySelector(".overflow")
+
+parents.forEach(element => {
+   element.addEventListener("mouseenter", (event) => {
+     var targetElem = event.target.children[1]
+     if(targetElem){
+        targetElem.classList.add("visible")
+        var rect = targetElem.getBoundingClientRect()
+        var distFromRight = document.documentElement.clientWidth - rect.right
+        if(distFromRight < 0){
+          targetElem.style.left = distFromRight + "px"
+        }
+     }
+  })
+  })  
+}) 
+  
+</script>
+
+
+<ul class="list-unstyled header__menus top-list">
+  {%- for link in linklists[section.settings.menu].links -%}
+    {%- liquid
+      assign menuTitle = link.title | handleize
+      assign blockData = ''
+      for block in section.blocks
+        assign blockParent = block.settings.title | handleize
+        if blockParent == menuTitle
+          assign blockData = block
+          break
+        endif
+      endfor
+    -%}
+
+    <li class="header__menus-item ">
+      <a href="{{ link.url }}" class="unstyled-link header__menus-link top-level">
+        {% if section.settings.desktop_font_bold %}
+          <strong>{{ link.title | escape }}</strong>
+        {% else %}
+          {{ link.title | escape }}
+        {% endif %}
+        <svg
+          class="icon"
+          version="1.1"
+          x="0px"
+          y="0px"
+          viewBox="0 0 11 7"
+          style="enable-background:new 0 0 11 7;"
+        >
+          <polygon points="9.5,0.6 5.5,4.6 1.5,0.6 0.6,1.5 5.5,6.4 10.4,1.5 "/>
+        </svg>
+      </a>
+      <div class="header__menus-dropdown overflow {{ section.settings.megamenu_color_scheme }}-color-scheme">
+        <ul class="list-unstyled dropdown-links {%  if link.links.size > 10 %} long-list {% elsif link.links.size > 6 %} med-list {%  endif %}">
+          {% if link.links == blank %}
+            <p class="placeholder">Coming Soon!</p>
+          {% else %}
+            {%- for childlink in link.links -%}
+              <div class="drop-wrap">
+              <li class="dropdown-links-item drop-link">
+                <a href="{{ childlink.url }}" class="unstyled-link header__menus-link spin-link">
+                  {% if section.settings.desktop_font_bold %}
+                    <strong>{{ childlink.title | escape }}</strong>
+                  {% else %}
+                    {{ childlink.title | escape }}
+                  {% endif %}
+                  {% if childlink.links != blank %}
+                    <svg
+                      class="icon"
+                      version="1.1"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 11 7"
+                      style="enable-background:new 0 0 11 7;"
+                    >
+                      <polygon points="9.5,0.6 5.5,4.6 1.5,0.6 0.6,1.5 5.5,6.4 10.4,1.5 "/>
+                    </svg>
+                  {% endif %}
+                </a>
+                {% if childlink.links != blank %}
+                  <div class="child-list">
+                    {%- for grandchildlink in childlink.links -%}
+                      <a class="unstyled-link header__menus-link" href="{{ grandchildlink.url }}">
+                        {{ grandchildlink.title }}
+                      </a>
+                    {%- endfor -%}
+                  </div>
+                {% endif %}
+              </li>
+              </div>
+            {%- endfor -%}
+          {% endif %}
+        </ul>
+      </div>
+    </li>
+  {%- endfor -%}
+</ul>
+                        
+  <style>
+
+    .icon{
+      display:inline;
+    }
+   
+    .top-level{
+      padding-block:12px;
+    }
+    .placeholder{
+      padding:16px 26px;
+    }
+
+
+  .drop-link{   
+    position:relative;
+  }
+  
+  .overflow{
+    overflow-y: visible;
+    overflow-x:visible;
+    border:1px hsla(0, 0%, 100%, 0.31) solid;
+  }
+
+  .long-list{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    overflow:visible;
+  }
+
+  .med-list{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    overflow:visible;
+  }
+
+  .overflow:has(.long-list){
+    max-height:75vh;    
+    width:420px;
+  }
+
+  .overflow:has(.med-list){
+    max-height:75vh;    
+    width:350px;
+  }
+
+
+  .child-list{
+    padding:10px;
+    max-width:200px;
+    max-height:75vh;
+    overflow-y:scroll;
+    position: absolute;
+    top:10px;
+    right: -120px;
+    transform:translateY(20px);
+    transform-origin: top;
+    transition: .4s ease;
+    background-color:black;
+    pointer-events: none;
+    border:1px hsla(0, 0%, 100%, 0.31) solid;
+    visibility:hidden;
+    opacity:0;
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+    }
+
+  .visible{
+  visibility: visible;
+  }
+
+    .drop-link:hover .child-list{
+      opacity: 1;      
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    .spin-link:hover svg.icon{
+      transform: rotate(-90deg);
+    }
+
+     @media (min-width: 992px){
+      .top-list{
+        display:grid;
+        grid-template-columns: repeat(3, max-content)
+    }
+      .top-level{
+        padding-block:6px;
+      }
+    }
+    @media (min-width: 1100px){
+      .top-list{
+        display:grid;
+        grid-template-columns: repeat(4, max-content)
+    }
+    }
+    @media (min-width: 1400px){
+      .top-list{
+        display:grid;
+        grid-template-columns: repeat(5, max-content)
+    }
+    }
+    @media (min-width:1550px){
+      .top-list{
+        display:grid;
+        grid-template-columns: repeat(6, max-content)
+      }
+    }
+    @media (min-width:1700px){
+      .top-list{
+        display:grid;
+        grid-template-columns: repeat(7, max-content)
+      }
+    }
+      @media (min-width:1800px){
+      .top-list{
+        display:grid;
+        grid-template-columns: repeat(8, max-content)
+      }
+    }
+    
+</style>
